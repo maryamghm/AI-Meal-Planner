@@ -1,6 +1,10 @@
 package org.dci.aimealplanner.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.dci.aimealplanner.models.Role;
 import org.dci.aimealplanner.models.UserType;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,6 +13,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
