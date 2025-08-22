@@ -43,6 +43,7 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(updatable = false)
     private LocalDateTime deletedAt;
 
     public void softDelete() {
