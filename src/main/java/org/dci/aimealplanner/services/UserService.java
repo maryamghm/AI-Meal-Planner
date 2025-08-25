@@ -3,6 +3,7 @@ package org.dci.aimealplanner.services;
 import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.entities.User;
 import org.dci.aimealplanner.repositories.UserRepository;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -51,6 +52,20 @@ public class UserService implements UserDetailsService {
 
     public User create(User user) {
         return userRepository.save(user);
+    }
+
+    public User update(User user) {
+        return userRepository.save(user);
+    }
+
+    public boolean userExistWithVerificationToken(String verificationToken) {
+        return userRepository.findByVerificationToken(verificationToken).isPresent();
+    }
+
+    public User findByVerificationToken(String token) {
+        return userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException(
+                        String.format("User with verification token %s not found.", token)));
     }
 
 }
