@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: #333;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 1rem;
+}
+
+.footer {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.footer a {
+    color: white;
+    text-decoration: none;
+    margin: 0 0.5rem;
+}
