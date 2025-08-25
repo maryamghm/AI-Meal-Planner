@@ -3,9 +3,11 @@ package org.dci.aimealplanner.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.entities.User;
+import org.dci.aimealplanner.exceptions.EmailAlreadyTaken;
+import org.dci.aimealplanner.exceptions.PasswordInvalid;
+import org.dci.aimealplanner.exceptions.VerificationTokenInvalid;
 import org.dci.aimealplanner.models.Role;
 import org.dci.aimealplanner.models.UserType;
-import org.dci.aimealplanner.services.EmailService;
 import org.dci.aimealplanner.services.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -22,8 +24,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
 
     @GetMapping("/login")
     public String login(){
@@ -42,13 +42,11 @@ public class AuthController {
                            Model model) {
         List<String> errors = new ArrayList<>();
 
-        if (userService.emailAlreadyExists(user.getEmail())) {
-            errors.add("Email is already taken.");
-        }
-
-        if (!userService.ifPasswordMatchesPattern(user.getPassword())) {
-            errors.add("Password must be at least 6 characters and contain uppercase," +
-                    " lowercase, number and special character.");
+        try {
+            userService.checkEmailAvailability(user.getEmail());
+            userService.checkPasswordValidity(user.getPassword());
+        } catch (EmailAlreadyTaken | PasswordInvalid ex) {
+            errors.add(ex.getMessage());
         }
 
         if (!errors.isEmpty() || bindingResult.hasErrors()) {
@@ -57,16 +55,9 @@ public class AuthController {
             return "auth/register";
         }
 
-        String token = UUID.randomUUID().toString();
-        user.setVerificationToken(token);
-        emailService.sendVerificationEmail(user.getEmail(),token);
-        user.setEmailVerified(false);
+        User addedUser = userService.create(user);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.USER);
-        user.setUserType(UserType.LOCAL);
-
-        userService.create(user);
+        userService.sendVerificationToken(addedUser);
 
         return "redirect:/auth/login?registered";
 
@@ -74,16 +65,10 @@ public class AuthController {
 
     @GetMapping("/verify")
     public String verifyUser(@RequestParam("token") String token, Model model) {
-        if (userService.userExistWithVerificationToken(token)) {
-            User user = userService.findByVerificationToken(token);
-
-            user.setEmailVerified(true);
-            user.setVerificationToken(null);
-
-            userService.update(user);
-
-            return "redirect:/auth/login?verified";
-        } else {
+       try {
+           userService.verifyToken(token);
+           return "redirect:/auth/login?verified";
+       } catch (VerificationTokenInvalid ex){
             return "redirect:/auth/login?invalidToken";
         }
     }

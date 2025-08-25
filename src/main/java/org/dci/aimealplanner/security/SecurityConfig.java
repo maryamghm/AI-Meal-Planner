@@ -26,7 +26,7 @@ public class SecurityConfig {
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/auth/login")
-                        .usernameParameter("emails")
+                        .usernameParameter("email")
                         .permitAll()
                 )
                 .logout(logout -> logout
