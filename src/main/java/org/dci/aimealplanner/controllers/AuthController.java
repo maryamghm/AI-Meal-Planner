@@ -5,18 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.entities.User;
 import org.dci.aimealplanner.models.Role;
 import org.dci.aimealplanner.models.UserType;
+import org.dci.aimealplanner.services.EmailService;
 import org.dci.aimealplanner.services.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/auth")
@@ -24,6 +23,7 @@ import java.util.List;
 public class AuthController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @GetMapping("/login")
     public String login(){
@@ -48,7 +48,7 @@ public class AuthController {
 
         if (!userService.ifPasswordMatchesPattern(user.getPassword())) {
             errors.add("Password must be at least 6 characters and contain uppercase," +
-                    " lowercase, number and special character");
+                    " lowercase, number and special character.");
         }
 
         if (!errors.isEmpty() || bindingResult.hasErrors()) {
@@ -57,14 +57,34 @@ public class AuthController {
             return "auth/register";
         }
 
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        emailService.sendVerificationEmail(user.getEmail(),token);
+        user.setEmailVerified(false);
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
         user.setUserType(UserType.LOCAL);
-        user.setEmailVerified(true);
+
         userService.create(user);
 
-        return "redirect:/home/index";
+        return "redirect:/auth/login?registered";
 
+    }
 
+    @GetMapping("/verify")
+    public String verifyUser(@RequestParam("token") String token, Model model) {
+        if (userService.userExistWithVerificationToken(token)) {
+            User user = userService.findByVerificationToken(token);
+
+            user.setEmailVerified(true);
+            user.setVerificationToken(null);
+
+            userService.update(user);
+
+            return "redirect:/auth/login?verified";
+        } else {
+            return "redirect:/auth/login?invalidToken";
+        }
     }
 }
