@@ -1,13 +1,13 @@
 package org.dci.aimealplanner.services;
 
 import lombok.RequiredArgsConstructor;
-import org.dci.aimealplanner.entities.User;
+import org.dci.aimealplanner.entities.users.User;
 import org.dci.aimealplanner.exceptions.EmailAlreadyTaken;
 import org.dci.aimealplanner.exceptions.PasswordInvalid;
 import org.dci.aimealplanner.exceptions.VerificationTokenInvalid;
 import org.dci.aimealplanner.models.Role;
 import org.dci.aimealplanner.models.UserType;
-import org.dci.aimealplanner.repositories.UserRepository;
+import org.dci.aimealplanner.repositories.users.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
