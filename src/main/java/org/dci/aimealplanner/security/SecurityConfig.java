@@ -15,6 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
+    private final CustomLoginSuccessHandler loginSuccessHandler;
     private final UserService userService;
 
     @Bean
@@ -29,6 +30,10 @@ public class SecurityConfig {
                         .usernameParameter("email")
                         .permitAll()
                 )
+                .oauth2Login(oauth2Login -> {
+                    oauth2Login.loginPage("/auth/login")
+                            .successHandler(loginSuccessHandler);
+                })
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .permitAll()
@@ -37,7 +42,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder builder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
 
