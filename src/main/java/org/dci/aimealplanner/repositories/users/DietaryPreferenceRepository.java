@@ -1,6 +1,6 @@
-package org.dci.aimealplanner.repositories;
+package org.dci.aimealplanner.repositories.users;
 
-import org.dci.aimealplanner.entities.DietaryPreference;
+import org.dci.aimealplanner.entities.users.DietaryPreference;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

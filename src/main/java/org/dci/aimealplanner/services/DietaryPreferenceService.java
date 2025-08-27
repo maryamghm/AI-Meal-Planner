@@ -1,7 +1,7 @@
 package org.dci.aimealplanner.services;
 
 import lombok.RequiredArgsConstructor;
-import org.dci.aimealplanner.repositories.DietaryPreferenceRepository;
+import org.dci.aimealplanner.repositories.users.DietaryPreferenceRepository;
 import org.springframework.stereotype.Service;
 
 @Service
