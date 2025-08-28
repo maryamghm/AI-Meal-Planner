@@ -27,14 +27,14 @@ public class NutritionFact {
     private Double protein;
 
     @PositiveOrZero
-    private double carbs;
+    private Double carbs;
 
     @PositiveOrZero
-    private double fat;
+    private Double fat;
 
     @PositiveOrZero
-    private double fiber;
+    private Double fiber;
 
     @PositiveOrZero
-    private double sugar;
+    private Double sugar;
 }

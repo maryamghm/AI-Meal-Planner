@@ -2,7 +2,7 @@ package org.dci.aimealplanner.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.dci.aimealplanner.entities.User;
+import org.dci.aimealplanner.entities.users.User;
 import org.dci.aimealplanner.exceptions.EmailAlreadyTaken;
 import org.dci.aimealplanner.exceptions.PasswordInvalid;
 import org.dci.aimealplanner.exceptions.VerificationTokenInvalid;

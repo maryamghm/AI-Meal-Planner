@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.dci.aimealplanner.entities.User;
+import org.dci.aimealplanner.entities.users.User;
 import org.dci.aimealplanner.models.Role;
 import org.dci.aimealplanner.models.UserType;
 import org.dci.aimealplanner.services.UserService;
