@@ -6,10 +6,7 @@ import org.dci.aimealplanner.entities.User;
 import org.dci.aimealplanner.exceptions.EmailAlreadyTaken;
 import org.dci.aimealplanner.exceptions.PasswordInvalid;
 import org.dci.aimealplanner.exceptions.VerificationTokenInvalid;
-import org.dci.aimealplanner.models.Role;
-import org.dci.aimealplanner.models.UserType;
 import org.dci.aimealplanner.services.UserService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/auth")
