@@ -1,11 +1,86 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Register</title>
-    <style th:replace="~{fragments/main_navigation :: main_navigation_style}"></style>
+    <title>AI Meal Planner - Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #003366, #00bfa6);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .signup-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+        .signup-logo {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .signup-logo img {
+            width: 160px;
+            height: auto;
+        }
+        .signup-logo h3 {
+            margin-top: 0.5rem;
+            font-weight: bold;
+            color: #003366;
+        }
+        .btn-signup {
+            background-color: #003366;
+            color: #fff;
+        }
+        .btn-signup:hover {
+            background-color: #002244;
+        }
+    </style>
 </head>
 <body>
-<div th:replace="~{fragments/main_navigation :: navbar}"></div>
+<div class="signup-card">
+    <div class="signup-logo">
+        <img src="/images/app_logo.png" alt="AI Meal Planner Logo">
+        <h3>Create Account</h3>
+    </div>
+
+    <form th:action="@{/auth/signup}" th:object="${user}" method="post">
+        <div th:if="${errors != null}" class="alert alert-danger">
+            <ul>
+                <li th:each="err : ${errors}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" th:field="*{email}" class="form-control" id="email" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" th:field="*{password}" class="form-control" id="password" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input type="password" name="confirmPassword" class="form-control" id="confirmPassword" required>
+        </div>
+
+        <button type="submit" class="btn btn-signup w-100">Sign Up</button>
+    </form>
+
+    <div class="text-center mt-3">
+        Already have an account? <a th:href="@{/auth/login}">Login</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
