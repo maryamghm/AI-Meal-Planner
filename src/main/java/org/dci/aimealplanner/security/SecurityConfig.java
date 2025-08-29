@@ -1,7 +1,7 @@
 package org.dci.aimealplanner.security;
 
 import lombok.RequiredArgsConstructor;
-import org.dci.aimealplanner.services.UserService;
+import org.dci.aimealplanner.services.users.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

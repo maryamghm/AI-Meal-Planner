@@ -25,19 +25,11 @@ public class Ingredient {
     @Size(min = 2, max = 100, message = "Ingredients's name must be between 2 and 100 characters")
     private String name;
 
-    @OneToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "category_id")
     private IngredientCategory category;
 
-    @OneToOne
-    @JoinColumn(name = "nutrition_fact_id", referencedColumnName = "id")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "nutrition_fact_id")
     private NutritionFact nutritionFact;
-
-    @ManyToMany
-    @JoinTable(
-            name = "ingredients_units",
-            joinColumns = @JoinColumn(name = "ingredient_id"),
-            inverseJoinColumns = @JoinColumn(name = "unit_id")
-    )
-    private List<Unit> units;
 }

@@ -6,14 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(
-        name = "recipe_ingredients",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_recipe_ingredient_unit",
-                columnNames = {"recipe_id", "ingredient_id", "unit_id"}
-        )
-)
+@Entity(name = "meal_category")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

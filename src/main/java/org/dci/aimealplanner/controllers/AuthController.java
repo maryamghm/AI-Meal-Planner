@@ -6,7 +6,7 @@ import org.dci.aimealplanner.entities.users.User;
 import org.dci.aimealplanner.exceptions.EmailAlreadyTaken;
 import org.dci.aimealplanner.exceptions.PasswordInvalid;
 import org.dci.aimealplanner.exceptions.VerificationTokenInvalid;
-import org.dci.aimealplanner.services.UserService;
+import org.dci.aimealplanner.services.users.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

@@ -12,6 +12,13 @@ import org.dci.aimealplanner.entities.ingredients.Unit;
 import java.math.BigDecimal;
 
 @Entity(name = "recipe_ingredients")
+@Table(
+        name = "recipe_ingredients",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_recipe_ingredient_unit",
+                columnNames = {"recipe_id", "ingredient_id", "unit_id"}
+        )
+)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

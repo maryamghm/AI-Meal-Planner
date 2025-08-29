@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.entities.users.User;
 import org.dci.aimealplanner.models.Role;
 import org.dci.aimealplanner.models.UserType;
-import org.dci.aimealplanner.services.UserService;
+import org.dci.aimealplanner.services.users.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
