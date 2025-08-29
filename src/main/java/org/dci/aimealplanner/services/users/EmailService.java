@@ -1,4 +1,4 @@
-package org.dci.aimealplanner.services;
+package org.dci.aimealplanner.services.users;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

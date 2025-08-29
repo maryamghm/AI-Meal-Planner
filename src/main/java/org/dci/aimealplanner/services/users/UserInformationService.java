@@ -1,4 +1,4 @@
-package org.dci.aimealplanner.services;
+package org.dci.aimealplanner.services.users;
 
 import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.repositories.users.UserInformationRepository;
