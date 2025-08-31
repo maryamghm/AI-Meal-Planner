@@ -1,11 +1,20 @@
 package org.dci.aimealplanner.bootstrap.seeding;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import org.dci.aimealplanner.entities.ingredients.Ingredient;
+import org.dci.aimealplanner.entities.ingredients.IngredientUnitRatio;
+import org.dci.aimealplanner.entities.ingredients.Unit;
+import org.dci.aimealplanner.integration.configs.aiapi.GroqApiClient;
+import org.dci.aimealplanner.integration.configs.aiapi.dtos.IngredientUnitFromAI;
+import org.dci.aimealplanner.integration.configs.aiapi.dtos.UnitRatios;
 import org.dci.aimealplanner.integration.foodapi.FoodApiClient;
 import org.dci.aimealplanner.integration.foodapi.OpenFoodFactsClient;
 import org.dci.aimealplanner.integration.foodapi.dto.FoodItem;
 import org.dci.aimealplanner.services.ingredients.IngredientCategoryService;
 import org.dci.aimealplanner.services.ingredients.IngredientService;
+import org.dci.aimealplanner.services.ingredients.IngredientUnitRatioService;
+import org.dci.aimealplanner.services.ingredients.UnitService;
 import org.dci.aimealplanner.services.recipes.MealCategoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,15 +31,42 @@ public class IngredientSeeder implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(IngredientSeeder.class);
     private final FoodApiClient foodApiClient;
     private final OpenFoodFactsClient openFoodFactsClient;
+    private final GroqApiClient  groqApiClient;
     private final IngredientService ingredientService;
     private final IngredientCategoryService ingredientCategoryService;
     private final MealCategoryService mealCategoryService;
+    private final IngredientUnitRatioService ingredientUnitRatioService;
+    private final UnitService unitService;
+
 
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         //seedIngredients();
         // seedMealCategory();
+        retrieveUnits();
+    }
+
+    private void retrieveUnits() throws JsonProcessingException {
+        List<Ingredient> ingredients = ingredientService.findAll();
+
+        ingredients.forEach(ingredient -> {
+            try {
+                IngredientUnitFromAI ingredientUnitFromAI = groqApiClient.getUnitRatiosForIngredient(ingredient.getName());
+                List<UnitRatios> unitRatios = ingredientUnitFromAI.getUnits();
+                unitRatios.forEach(unitRatio -> {
+                    Unit unit = unitService.findByCode(unitRatio.getUnitCode());
+                    IngredientUnitRatio ingredientUnitRatio = new IngredientUnitRatio();
+                    ingredientUnitRatio.setIngredient(ingredient);
+                    ingredientUnitRatio.setUnit(unit);
+                    ingredientUnitRatio.setRatio(Double.valueOf(unitRatio.getGramsPerUnit()));
+                    ingredientUnitRatioService.create(ingredientUnitRatio);
+                });
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
     }
 
     private void seedIngredients() {
