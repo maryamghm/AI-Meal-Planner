@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "nutrition_fats")
+@Entity(name = "nutrition_facts")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
