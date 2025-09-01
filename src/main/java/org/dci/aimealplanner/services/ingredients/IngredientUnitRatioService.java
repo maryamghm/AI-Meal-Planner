@@ -1,6 +1,7 @@
 package org.dci.aimealplanner.services.ingredients;
 
 import lombok.RequiredArgsConstructor;
+import org.dci.aimealplanner.entities.ingredients.Ingredient;
 import org.dci.aimealplanner.entities.ingredients.IngredientUnitRatio;
 import org.dci.aimealplanner.repositories.ingredients.IngredientUnitRatioRepository;
 import org.springframework.stereotype.Service;
@@ -18,5 +19,9 @@ public class IngredientUnitRatioService {
 
     public List<IngredientUnitRatio> findAll() {
         return ingredientUnitRatioRepository.findAll();
+    }
+
+    public boolean rationExists(Ingredient ingredient) {
+        return !ingredientUnitRatioRepository.findByIngredient(ingredient).isEmpty();
     }
 }

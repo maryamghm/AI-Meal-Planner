@@ -25,7 +25,7 @@ public class GroqApiClient {
         String prompt = buildUnitRatioPrompt(ingredientName);
 
         Map<String, Object> body = Map.of(
-                "model", "llama3-70b-8192",
+                "model", "llama-3.3-70b-versatile",
                 "messages", List.of(
                         Map.of("role", "system", "content", "Return ONLY valid JSON. No code fences or commentary."),
                         Map.of("role", "user", "content", prompt)
