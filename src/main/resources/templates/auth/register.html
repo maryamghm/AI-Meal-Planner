@@ -1,53 +1,99 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>AI Meal Planner - Sign Up</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #003366, #00bfa6);
+            background: linear-gradient(135deg, #0F2027, #203A43, #2C5364);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
         }
+
         .signup-card {
-            background: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
             padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
             width: 100%;
-            max-width: 500px;
+            max-width: 420px;
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.15);
         }
+
         .signup-logo {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.25rem;
         }
         .signup-logo img {
-            width: 160px;
+            width: 220px;
             height: auto;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
         }
-        .signup-logo h3 {
-            margin-top: 0.5rem;
-            font-weight: bold;
-            color: #003366;
+
+        .tagline {
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #B0BEC5;
+            margin-top: -0.1rem;
+            margin-bottom: 1.25rem;
         }
+
         .btn-signup {
-            background-color: #003366;
+            background-color: #eb8914;
             color: #fff;
+            border: none;
+            font-weight: 500;
         }
         .btn-signup:hover {
-            background-color: #002244;
+            background-color: #d77d13;
         }
+
+        /*.form-label,*/
+        /*.form-check-label {*/
+        /*    color: #E0E0E0;*/
+        /*}*/
+
+        a {
+            color: #00BFA6;
+            font-weight: 500;
+        }
+        a:hover {
+            color: #eb8914;
+            text-decoration: underline;
+        }
+
+        /*.social-btn {*/
+        /*    border-radius: 10px;*/
+        /*    font-weight: 500;*/
+        /*}*/
+
+        /*.btn-outline-danger.social-btn {*/
+        /*    background-color: #DB4437;*/
+        /*    color: #ffffff;*/
+        /*    border-color: #DB4437;*/
+        /*}*/
+        /*.btn-outline-danger.social-btn:hover {*/
+        /*    background-color: #c23b2f;*/
+        /*    border-color: #c23b2f;*/
+        /*    color: #ffffff;*/
+        /*}*/
     </style>
 </head>
 <body>
 <div class="signup-card">
     <div class="signup-logo">
-        <img src="/images/app_logo.png" alt="AI Meal Planner Logo">
-        <h3>Create Account</h3>
+        <img src="/images/New_Logo_Transparent-V2.png" alt="AI Meal Planner Logo">
+        <div class="tagline">AI-powered meal planning</div>
+        <h3 class="fw-bold">Create Account</h3>
     </div>
 
     <form th:action="@{/auth/signup}" th:object="${user}" method="post">
