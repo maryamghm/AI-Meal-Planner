@@ -44,27 +44,31 @@ public class IngredientSeeder implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         //seedIngredients();
         // seedMealCategory();
-        retrieveUnits();
+        //retrieveUnits();
     }
 
     private void retrieveUnits() throws JsonProcessingException {
         List<Ingredient> ingredients = ingredientService.findAll();
 
+
         ingredients.forEach(ingredient -> {
-            try {
-                IngredientUnitFromAI ingredientUnitFromAI = groqApiClient.getUnitRatiosForIngredient(ingredient.getName());
-                List<UnitRatios> unitRatios = ingredientUnitFromAI.getUnits();
-                unitRatios.forEach(unitRatio -> {
-                    Unit unit = unitService.findByCode(unitRatio.getUnitCode());
-                    IngredientUnitRatio ingredientUnitRatio = new IngredientUnitRatio();
-                    ingredientUnitRatio.setIngredient(ingredient);
-                    ingredientUnitRatio.setUnit(unit);
-                    ingredientUnitRatio.setRatio(Double.valueOf(unitRatio.getGramsPerUnit()));
-                    ingredientUnitRatioService.create(ingredientUnitRatio);
-                });
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+            if (!ingredientUnitRatioService.rationExists(ingredient)) {
+                try {
+                    IngredientUnitFromAI ingredientUnitFromAI = groqApiClient.getUnitRatiosForIngredient(ingredient.getName());
+                    List<UnitRatios> unitRatios = ingredientUnitFromAI.getUnits();
+                    unitRatios.forEach(unitRatio -> {
+                        Unit unit = unitService.findByCode(unitRatio.getUnitCode());
+                        IngredientUnitRatio ingredientUnitRatio = new IngredientUnitRatio();
+                        ingredientUnitRatio.setIngredient(ingredient);
+                        ingredientUnitRatio.setUnit(unit);
+                        ingredientUnitRatio.setRatio(Double.valueOf(unitRatio.getGramsPerUnit()));
+                        ingredientUnitRatioService.create(ingredientUnitRatio);
+                    });
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
             }
+
         });
 
     }
