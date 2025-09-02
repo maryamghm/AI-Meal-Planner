@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin
                         .loginPage("/auth/login")
                         .usernameParameter("email")
+                        .successHandler(loginSuccessHandler)
                         .permitAll()
                 )
                 .oauth2Login(oauth2Login -> {
