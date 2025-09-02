@@ -99,11 +99,38 @@
     </div>
     <div class="tagline">AI-powered meal planning</div>
 
+    <div th:if="${param.logout}" class="alert alert-success" role="alert">
+        Thanks for coming. Please come back
+    </div>
 
-    <form th:action="@{/login}" method="post">
+    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+        Invalid username or password or not verified account
+    </div>
+
+    <div th:if="${param.invalidToken}" class="alert alert-danger" role="alert">
+        Invalid verification token
+    </div>
+
+    <div th:if="${param.verified}" class="alert alert-success" role="alert">
+        Email Successfully verified. You can now log in
+    </div>
+
+    <div th:if="${param.registered}" class="alert alert-success" role="alert">
+        Registration successful. Please Check your email for a verification link.
+    </div>
+
+
+    <div th:if="${param.accountDeleted}" class="alert alert-success" role="alert">
+        Account Successfully deleted. You can now create a new account.
+    </div>
+
+
+    <form th:action="@{/auth/login}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
         <div class="mb-3">
-            <label for="username" class="form-label">Email</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+            <label for="email" class="form-label">Email</label>
+            <input type="text" class="form-control" id="email" name="email" required>
         </div>
 
         <div class="mb-3">
