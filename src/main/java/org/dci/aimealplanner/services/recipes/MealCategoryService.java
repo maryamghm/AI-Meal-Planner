@@ -15,4 +15,8 @@ public class MealCategoryService {
     public void addAll(List<MealCategory> mealCategories) {
         mealCategoryRepository.saveAll(mealCategories);
     }
+
+    public List<MealCategory> findAll() {
+        return mealCategoryRepository.findAll();
+    }
 }

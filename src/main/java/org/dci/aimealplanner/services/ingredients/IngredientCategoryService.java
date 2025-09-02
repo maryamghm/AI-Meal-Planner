@@ -77,4 +77,7 @@ public class IngredientCategoryService {
                 .orElseThrow(() -> new IllegalStateException("Default category 'Uncategorized' not found. Seed it first."));
     }
 
+    public List<IngredientCategory> findAll() {
+        return ingredientCategoryRepository.findAll();
+    }
 }
