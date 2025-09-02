@@ -1,4 +1,4 @@
-package org.dci.aimealplanner.controllers;
+package org.dci.aimealplanner.controllers.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

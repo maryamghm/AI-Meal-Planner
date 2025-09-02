@@ -1,4 +1,4 @@
-package org.dci.aimealplanner.integration.configs.aiapi.dtos;
+package org.dci.aimealplanner.integration.aiapi.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

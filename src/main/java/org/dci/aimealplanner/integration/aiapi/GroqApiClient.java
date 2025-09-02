@@ -1,13 +1,11 @@
-package org.dci.aimealplanner.integration.configs.aiapi;
+package org.dci.aimealplanner.integration.aiapi;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.dci.aimealplanner.integration.configs.aiapi.dtos.AiResponse;
-import org.dci.aimealplanner.integration.configs.aiapi.dtos.IngredientUnitFromAI;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.dci.aimealplanner.integration.aiapi.dtos.AiResponse;
+import org.dci.aimealplanner.integration.aiapi.dtos.IngredientUnitFromAI;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 

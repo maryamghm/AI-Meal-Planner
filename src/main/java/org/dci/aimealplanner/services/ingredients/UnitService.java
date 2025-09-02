@@ -5,6 +5,7 @@ import org.dci.aimealplanner.entities.ingredients.Unit;
 import org.dci.aimealplanner.repositories.ingredients.UnitRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,5 +19,9 @@ public class UnitService {
 
     public Unit findByDisplayName(String displayName) {
         return unitRepository.findByDisplayName(displayName).orElseThrow(() -> new RuntimeException("Unit with display name " + displayName + " not found"));
+    }
+
+    public List<Unit> findAll() {
+        return unitRepository.findAll();
     }
 }
