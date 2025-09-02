@@ -44,6 +44,7 @@
             margin-bottom: 1rem;
         }
 
+        /* Global status (outside the form) */
         .status-region {
             margin-bottom: 0.8rem;
             border-top: 1px solid rgba(255,255,255,0.15);
@@ -73,6 +74,21 @@
         }
         .btn-signup:hover { background-color: #d77d13; }
 
+        .btn-google {
+            background-color: #DB4437;
+            color: #ffffff;
+            border-color: #DB4437;
+            padding: 0.45rem;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .btn-google:hover {
+            background-color: #c23b2f;
+            border-color: #c23b2f;
+            color: #ffffff;
+        }
+
         a { color: #00BFA6; font-weight: 500; font-size: 0.9rem; }
         a:hover { color: #eb8914; text-decoration: underline; }
     </style>
@@ -83,7 +99,6 @@
         <img src="/images/Ai_meal_planner_Logo.png" alt="AI Meal Planner Logo">
     </div>
     <div class="tagline">Create your account</div>
-
 
     <th:block th:with="
       hasGlobal=${(param.registerError != null) or (param.tokenInvalid != null) or (param.error != null)}">
@@ -101,18 +116,15 @@
     </th:block>
 
     <form th:action="@{/auth/signup}" th:object="${user}" method="post" novalidate>
-
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
 
         <div th:if="${(errors != null and !#lists.isEmpty(errors)) or #fields.hasErrors('*')}"
              class="alert alert-danger show mb-2" role="alert">
             <ul class="mb-0 ps-3">
-
-                <li th:each="err : ${errors}" th:text="${err}"
+                <li th:each="err : ${errors}"
+                    th:text="${err}"
                     th:if="${errors != null and !#lists.isEmpty(errors)}"></li>
-
-
                 <li th:each="fe : ${#fields.errors('*')}" th:text="${fe}"></li>
             </ul>
         </div>
@@ -148,6 +160,19 @@
         </div>
 
         <button type="submit" class="btn btn-signup w-100">Sign Up</button>
+
+        <div class="text-center my-2">OR</div>
+
+        <button type="button"
+                class="btn btn-google w-100"
+                onclick="window.location.href='/oauth2/authorization/google'">
+            <i class="bi bi-google"></i> Continue with Google
+        </button>
+
+        <p class="text-center mt-2" style="font-size:0.8rem; color:#B0BEC5;">
+            By continuing, you agree to our
+            <a th:href="@{/terms}">Terms</a> and <a th:href="@{/privacy}">Privacy Policy</a>.
+        </p>
     </form>
 
     <div class="text-center mt-2">
@@ -155,7 +180,6 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
