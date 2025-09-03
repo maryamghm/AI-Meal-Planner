@@ -2,13 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title th:text="${recipe.id == null} ? 'Add Recipe' : 'Edit Recipe'">Recipe</title>
+  <title th:text="${recipe.id == null ? 'Add Recipe' : 'Edit Recipe'}">Recipe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body class="bg-light">
 <div class="container py-4">
-  <h2 class="mb-4" th:text="${recipe.id == null} ? 'Add Recipe' : 'Edit Recipe'"></h2>
+  <h2 class="mb-4" th:text="${recipe.id == null ? 'Add Recipe' : 'Edit Recipe'}"></h2>
 
   <form th:object="${recipe}"
         th:action="${recipe.id == null} ? @{/recipes/create} : @{/recipes/update/{id}(id=${recipe.id})}"
@@ -18,7 +18,6 @@
     <input type="hidden" name="redirectUrl" th:value="${redirectUrl}" />
 
     <div class="row g-3">
-
       <div class="col-md-8">
         <label class="form-label">Title</label>
         <input th:field="*{title}" class="form-control" placeholder="e.g., Creamy Tomato Pasta" />
@@ -26,24 +25,27 @@
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Difficulty</label>
-        <select th:field="*{difficulty}" class="form-select" required>
-          <option value="">Select…</option>
-          <option th:each="d : ${difficulties}" th:value="${d}" th:text="${d}"></option>
+        <label for="difficulty" class="form-label">Difficulty</label>
+        <select id="difficulty" th:field="*{difficulty}" class="form-select" required>
+          <option value="" th:if="${recipe.id == null}" selected>Select Difficulty</option>
+          <option th:each="difficulty : ${difficulties}"
+                  th:value="${difficulty}"
+                  th:text="${#strings.toLowerCase(difficulty.name())}"
+                  th:selected="${recipe.difficulty != null and difficulty.name() == recipe.difficulty.name()}">
+          </option>
         </select>
         <div class="text-danger" th:if="${#fields.hasErrors('difficulty')}" th:errors="*{difficulty}"></div>
       </div>
 
       <div class="col-md-4">
-        <label class="form-label">Prep Time (min)</label>
-        <input type="number" min="1" th:field="*{preparationTimeMinutes}" class="form-control" />
+        <label for="preparationTimeMinutes" class="form-label">Preparation Time (minutes)</label>
+        <input id="preparationTimeMinutes" type="number" th:field="*{preparationTimeMinutes}" class="form-control" min="1">
         <div class="text-danger" th:if="${#fields.hasErrors('preparationTimeMinutes')}" th:errors="*{preparationTimeMinutes}"></div>
       </div>
 
       <div class="col-md-4">
         <label class="form-label">Servings</label>
         <input type="number" min="0.01" step="0.01" th:field="*{servings}" class="form-control" />
-        <div class="text-danger" th:if="${#fields.hasErrors('servings')}" th:errors="*{servings}"></div>
       </div>
 
       <div class="col-md-4">
@@ -51,117 +53,60 @@
         <select th:field="*{mealCategories}" class="form-select" multiple size="4">
           <option th:each="category : ${categories}"
                   th:value="${category.id}"
-                  th:text="${category.name}"></option>"
+                  th:text="${category.name}"
+                  th:selected="${recipe.mealCategories.?[id == category.id].size() > 0}">
+          </option>
         </select>
       </div>
 
-      <div class="mb-3">
+      <div class="col-12">
         <div class="d-flex justify-content-between align-items-center">
           <label class="form-label mb-0">Ingredients</label>
           <div class="d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-secondary" id="addRowBtn">Add Row</button>
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="openNewIngredientModal()">New Ingredient</button>
+            <!-- FIXED: only one type="button" -->
+            <button type="button" class="btn btn-sm btn-secondary" onclick="addRow()">Add row</button>
+            <a th:href="@{/ingredients/new}" class="btn btn-sm btn-outline-primary">Add Ingredient to DB</a>
           </div>
         </div>
 
-        <div id="ingredient-rows" class="mt-2">
-          <div class="row g-2 mb-2 align-items-end" th:each="ingredient, iterStat: *{ingredients}">
-            <input type="hidden" th:field="*{ingredients[__${iterStat.index}__].id}" />
-
-            <div class="col-lg-6">
-              <label class="form-label">Ingredient</label>
-              <select class="form-select ingredient-select"
-                      th:field="*{ingredients[__${iterStat.index}__].ingredient.id}"
-                      onchange="onIngredientChange(this)">
-                <option value="">Ingredient…</option>
-
-                <option th:each="ing : ${recipe.ingredients}"
-                        th:value="${ing.id}"
-                        th:text="${ing.ingredient.name}">
-                </option>
-
-                <optgroup label="New in this form" class="dynamic-new-ing"></optgroup>
-              </select>
-            </div>
-
-            <div class="col-lg-3">
-              <label class="form-label">Amount</label>
-              <input type="number" min="0.001" step="0.001"
-                     class="form-control"
-                     th:field="*{ingredients[__${iterStat.index}__].amount}" placeholder="e.g. 2.5">
-            </div>
-
-            <div class="col-lg-2">
-              <label class="form-label">Unit</label>
-              <select class="form-select"
-                      th:field="*{ingredients[__${iterStat.index}__].unit.id}">
-                <option value="">Unit…</option>
-                <option th:each="u : ${unitList}"
-                        th:value="${u.id}"
-                        th:text="${u.displayName != null ? u.displayName : u.code}">
-                </option>
-              </select>
-            </div>
-
-            <div class="col-lg-1 d-grid">
-              <button type="button" class="btn btn-outline-danger" onclick="removeRow(this)">✕</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-danger" th:if="${#fields.hasErrors('ingredients')}" th:errors="*{ingredients}"></div>
-      </div>
-
-      <div id="new-ingredients-hidden"></div>
-
-      <div class="modal fade" id="newIngredientModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Create New Ingredient</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-              <div class="mb-3">
-                <label class="form-label">Name</label>
-                <input id="newIngName" class="form-control" placeholder="e.g., Zucchini">
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Category (optional)</label>
-                <select id="newIngCategoryId" class="form-select">
-                  <option value="">— none —</option>
-                  <option th:each="cat : ${ingredientCategories}"
-                          th:value="${cat.id}"
-                          th:text="${cat.name}"></option>
+        <div class="table-responsive mt-2">
+          <table class="table align-middle mb-0">
+            <thead>
+            <tr>
+              <th style="width:45%">Ingredient</th>
+              <th style="width:20%">Amount</th>
+              <th style="width:25%">Unit</th>
+              <th style="width:10%">Remove</th>
+            </tr>
+            </thead>
+            <tbody id="ingredient-rows">
+            <tr th:each="ri, iStat : *{ingredients}">
+              <td>
+                <select class="form-select ingredient-select" th:field="*{ingredients[__${iStat.index}__].ingredient.id}">
+                  <option value="">— choose —</option>
+                  <option th:each="ing : ${ingredientList}"
+                          th:value="${ing.id}"
+                          th:text="${ing.name}">
+                  </option>
                 </select>
-              </div>
-
-              <hr class="my-3">
-
-              <div class="row g-2">
-                <div class="col-6">
-                  <label class="form-label">Amount (for this recipe)</label>
-                  <input id="newIngAmount" type="number" min="0.001" step="0.001" class="form-control" placeholder="e.g., 2.5">
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Unit</label>
-                  <select id="newIngUnitId" class="form-select">
-                    <option value="">Unit…</option>
-                    <option th:each="u : ${unitList}"
-                            th:value="${u.id}"
-                            th:text="${u.displayName != null ? u.displayName : u.code}"></option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" onclick="saveNewIngredient()">Add</button>
-            </div>
-          </div>
+              </td>
+              <td>
+                <input type="number" min="0.001" step="0.001" class="form-control"
+                       th:field="*{ingredients[__${iStat.index}__].amount}">
+              </td>
+              <td>
+                <select class="form-select unit-select"
+                        th:field="*{ingredients[__${iStat.index}__].unit.id}"
+                        th:attr="data-initial-unit=${ri.unit != null ? ri.unit.id : ''}">
+                  <option value="">— none —</option>
+                </select>
+              </td>
+              <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeRow(this)">✕</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -177,164 +122,108 @@
       </div>
 
       <div class="col-12 d-flex gap-2 mt-2">
-        <button class="btn btn-primary" type="submit" th:text="${recipe.id == null} ? 'Create' : 'Update'"></button>
+        <button class="btn btn-primary" type="submit" th:text="${recipe.id == null ? 'Create' : 'Update'}"></button>
         <a th:href="${redirectUrl}" class="btn btn-secondary">Cancel</a>
       </div>
     </div>
   </form>
 </div>
 
-<script th:inline="javascript">
-  /*<![CDATA[*/
+<select id="ingredientMaster" class="d-none">
+  <option value="">— choose —</option>
+  <option th:each="ing : ${ingredientList}"
+          th:value="${ing.id}"
+          th:text="${ing.name}">
+  </option>
+</select>
 
-  const ingredientsLookup = /*[[${ingredientsList}]]*/ [];
-  const unitsLookup = /*[[${unitsList}]]*/ [];
-  const ingCats = /*[[${ingredientCategories}]]*/ [];
+<div id="unit-templates" class="d-none">
+  <select th:each="ing : ${ingredientList}" th:attr="data-ingredient-id=${ing.id}">
+    <option value="">— none —</option>
+    <option th:each="ur : ${ing.unitRatios}"
+            th:value="${ur.unit.id}"
+            th:text="${ur.unit.displayName != null ? ur.unit.displayName : ur.unit.code}">
+    </option>
+  </select>
+</div>
 
-  let nextTempIngredientId = -1;
+<script>
+  function nextIndex() {
+    return document.querySelectorAll('#ingredient-rows tr').length;
+  }
 
-  document.getElementById('addRowBtn').addEventListener('click', addIngredientRow);
+  function getUnitTemplateHtml(ingredientId) {
+    const tpl = document.querySelector('#unit-templates select[data-ingredient-id="' + ingredientId + '"]');
+    return tpl ? tpl.innerHTML : '<option value="">— none —</option>';
+  }
 
-  function addIngredientRow(prefill = null) {
-    const container = document.getElementById('ingredient-rows');
-    const index = container.querySelectorAll('.row.g-2').length;
+  function populateUnits(unitSelect, ingredientId, selectedUnitId) {
+    unitSelect.innerHTML = getUnitTemplateHtml(ingredientId || '');
+    if (selectedUnitId) {
+      unitSelect.value = String(selectedUnitId);
+      if (unitSelect.value !== String(selectedUnitId)) {
+        unitSelect.value = '';
+      }
+    }
+  }
 
-    const row = document.createElement('div');
-    row.className = 'row g-2 mb-2 align-items-end';
+  function wireRow(row) {
+    const ingSel = row.querySelector('.ingredient-select');
+    const unitSel = row.querySelector('.unit-select');
 
-    const ingOptions = [
-      '<option value="">Ingredient…</option>',
-      ...ingredientsLookup.map(i => `<option value="${i.id}">${escapeHtml(i.name)}</option>`),
-      '<optgroup label="New in this form" class="dynamic-new-ing"></optgroup>'
-    ].join('');
+    const initialUnit = unitSel.getAttribute('data-initial-unit') || '';
+    populateUnits(unitSel, ingSel.value, initialUnit);
 
-    const unitOptions = [
-      '<option value="">Unit…</option>',
-      ...unitsLookup.map(u => `<option value="${u.id}">${escapeHtml(u.displayName ?? u.code)}</option>`)
-    ].join('');
+    ingSel.addEventListener('change', () => {
+      populateUnits(unitSel, ingSel.value, null);
+    });
+  }
 
-    row.innerHTML = `
-      <input type="hidden" name="ingredients[${index}].id">
-      <div class="col-lg-6">
-        <label class="form-label">Ingredient</label>
-        <select class="form-select ingredient-select" name="ingredients[${index}].ingredientId" onchange="onIngredientChange(this)">
-          ${ingOptions}
+  function addRow() {
+    const i = nextIndex();
+    const ingOpts = document.getElementById('ingredientMaster').innerHTML;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <select class="form-select ingredient-select" name="ingredients[${i}].ingredient.id">
+          ${ingOpts}
         </select>
-      </div>
-      <div class="col-lg-3">
-        <label class="form-label">Amount</label>
-        <input type="number" min="0.001" step="0.001" class="form-control" name="ingredients[${index}].amount" placeholder="e.g. 2.5">
-      </div>
-      <div class="col-lg-2">
-        <label class="form-label">Unit</label>
-        <select class="form-select" name="ingredients[${index}].unitId">
-          ${unitOptions}
+      </td>
+      <td>
+        <input type="number" min="0.001" step="0.001" class="form-control"
+               name="ingredients[${i}].amount" placeholder="e.g., 2.5">
+      </td>
+      <td>
+        <select class="form-select unit-select" name="ingredients[${i}].unit.id" data-initial-unit="">
+          <option value="">— none —</option>
         </select>
-      </div>
-      <div class="col-lg-1 d-grid">
-        <button type="button" class="btn btn-outline-danger" onclick="removeRow(this)">✕</button>
-      </div>
+      </td>
+      <td class="text-center">
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeRow(this)">✕</button>
+      </td>
     `;
-
-    container.appendChild(row);
-
-    // Prefill from modal (ingredient + amount + unit)
-    if (prefill?.ingredientId != null) {
-      row.querySelector('.ingredient-select').value = String(prefill.ingredientId);
-    }
-    if (prefill?.amount != null && !Number.isNaN(prefill.amount)) {
-      row.querySelector(`input[name="ingredients[${index}].amount"]`).value = prefill.amount;
-    }
-    if (prefill?.unitId) {
-      row.querySelector(`select[name="ingredients[${index}].unitId"]`).value = String(prefill.unitId);
-    }
+    document.getElementById('ingredient-rows').appendChild(tr);
+    wireRow(tr);
   }
 
   function removeRow(btn) {
-    const row = btn.closest('.row.g-2');
-    row?.parentNode?.removeChild(row);
-  }
+    const tr = btn.closest('tr');
+    if (tr) tr.remove();
 
-  function onIngredientChange(selectEl) {
-    // hook for future behavior if needed
-  }
-
-  // === New Ingredient Modal helpers ===
-  let newIngModal;
-  function openNewIngredientModal() {
-    const modalEl = document.getElementById('newIngredientModal');
-    newIngModal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    document.getElementById('newIngName').value = '';
-    document.getElementById('newIngCategoryId').value = '';
-    document.getElementById('newIngAmount').value = '';
-    document.getElementById('newIngUnitId').value = '';
-    newIngModal.show();
-  }
-
-  function saveNewIngredient() {
-    const name = document.getElementById('newIngName').value?.trim();
-    if (!name) {
-      alert('Please enter a name for the ingredient.');
-      return;
-    }
-    const categoryId = document.getElementById('newIngCategoryId').value || '';
-    const amountRaw = document.getElementById('newIngAmount').value;
-    const unitId = document.getElementById('newIngUnitId').value || '';
-
-    const amount = amountRaw !== '' ? Number(amountRaw) : null;
-    if (amountRaw !== '' && (isNaN(amount) || amount <= 0)) {
-      alert('Please provide a valid amount greater than 0.');
-      return;
-    }
-
-    // assign a temporary negative ID so it doesn't collide with real DB IDs
-    const tempId = nextTempIngredientId--;
-
-    // 1) hidden inputs for backend to create this ingredient
-    const hiddenBucket = document.getElementById('new-ingredients-hidden');
-    const newIndex = hiddenBucket.querySelectorAll('[data-new-ing="1"]').length;
-
-    const wrapper = document.createElement('div');
-    wrapper.dataset.newIng = '1';
-    wrapper.innerHTML = `
-      <input type="hidden" name="newIngredients[${newIndex}].tempId" value="${tempId}">
-      <input type="hidden" name="newIngredients[${newIndex}].name" value="${escapeAttr(name)}">
-      <input type="hidden" name="newIngredients[${newIndex}].categoryId" value="${escapeAttr(categoryId)}">
-    `;
-    hiddenBucket.appendChild(wrapper);
-
-    // 2) add this new ingredient to every dropdown under an <optgroup>
-    const allSelects = document.querySelectorAll('#ingredient-rows .ingredient-select');
-    allSelects.forEach(sel => {
-      let group = sel.querySelector('optgroup.dynamic-new-ing');
-      if (!group) {
-        const og = document.createElement('optgroup');
-        og.label = 'New in this form';
-        og.classList.add('dynamic-new-ing');
-        sel.appendChild(og);
-        group = og;
-      }
-      const opt = document.createElement('option');
-      opt.value = String(tempId);
-      opt.textContent = name;
-      group.appendChild(opt);
+    const rows = document.querySelectorAll('#ingredient-rows tr');
+    rows.forEach((row, idx) => {
+      row.querySelectorAll('select, input').forEach(el => {
+        el.name = el.name.replace(/ingredients\[\d+]/, 'ingredients[' + idx + ']');
+      });
     });
-
-    // 3) add a new row pre-selected with this ingredient, amount, and unit
-    addIngredientRow({ ingredientId: tempId, amount, unitId: unitId || null });
-
-    newIngModal.hide();
   }
 
-  // util helpers
-  function escapeHtml(s) {
-    return s?.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) ?? '';
-  }
-  function escapeAttr(s) {
-    return String(s ?? '').replace(/"/g, '&quot;');
-  }
-  /*]]>*/
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('#ingredient-rows tr').forEach(wireRow);
+  });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

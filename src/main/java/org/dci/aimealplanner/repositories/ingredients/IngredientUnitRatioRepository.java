@@ -11,4 +11,5 @@ import java.util.List;
 public interface IngredientUnitRatioRepository extends JpaRepository<IngredientUnitRatio, Long> {
 
     List<IngredientUnitRatio> findByIngredient(Ingredient ingredient);
+    List<IngredientUnitRatio> findByIngredientIdIn(List<Long> ingredientIds);
 }

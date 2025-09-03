@@ -32,4 +32,8 @@ public class Ingredient {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "nutrition_fact_id")
     private NutritionFact nutritionFact;
+
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IngredientUnitRatio> unitRatios;
+
 }

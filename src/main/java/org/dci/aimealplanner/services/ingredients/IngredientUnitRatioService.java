@@ -6,6 +6,7 @@ import org.dci.aimealplanner.entities.ingredients.IngredientUnitRatio;
 import org.dci.aimealplanner.repositories.ingredients.IngredientUnitRatioRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -23,5 +24,13 @@ public class IngredientUnitRatioService {
 
     public boolean rationExists(Ingredient ingredient) {
         return !ingredientUnitRatioRepository.findByIngredient(ingredient).isEmpty();
+    }
+
+    public List<IngredientUnitRatio> findByIngredientIdIn(List<Long> ingredientIds) {
+        return ingredientUnitRatioRepository.findByIngredientIdIn(ingredientIds);
+    }
+
+    public List<IngredientUnitRatio> findByIngredient(Ingredient ingredient) {
+        return ingredientUnitRatioRepository.findByIngredient(ingredient);
     }
 }

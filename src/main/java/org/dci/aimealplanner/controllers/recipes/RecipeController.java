@@ -1,7 +1,13 @@
 package org.dci.aimealplanner.controllers.recipes;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.dci.aimealplanner.controllers.auth.AuthUtils;
+import org.dci.aimealplanner.entities.ingredients.Ingredient;
+import org.dci.aimealplanner.entities.ingredients.Unit;
 import org.dci.aimealplanner.entities.recipes.Recipe;
+import org.dci.aimealplanner.entities.recipes.RecipeIngredient;
 import org.dci.aimealplanner.models.Difficulty;
 import org.dci.aimealplanner.services.ingredients.IngredientCategoryService;
 import org.dci.aimealplanner.services.ingredients.IngredientService;
@@ -9,10 +15,14 @@ import org.dci.aimealplanner.services.ingredients.IngredientUnitRatioService;
 import org.dci.aimealplanner.services.ingredients.UnitService;
 import org.dci.aimealplanner.services.recipes.MealCategoryService;
 import org.dci.aimealplanner.services.recipes.RecipeService;
+import org.dci.aimealplanner.services.users.UserService;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -24,14 +34,48 @@ public class RecipeController {
     private final UnitService  unitService;
     private final IngredientUnitRatioService  ingredientUnitRatioService;
     private final IngredientCategoryService ingredientCategoryService;
+    private final UserService userService;
 
     @GetMapping("/new")
-    public String newRecipe(Model model) {
-        model.addAttribute("recipe", new Recipe());
-        model.addAttribute("difficulties", Difficulty.values());
-        model.addAttribute("unitList", unitService.findAll());
-        model.addAttribute("ingredientCategories", ingredientCategoryService.findAll());
-        model.addAttribute("categories", mealCategoryService.findAll());
+    public String newRecipe(Authentication authentication,
+                            Model model,
+                            HttpServletRequest request) {
+        String email = AuthUtils.getUserEmail(authentication);
+        Recipe recipe = new Recipe();
+        prepareFormModel(model, email, recipe, request.getHeader("Referer"));
         return "recipes/recipe_form";
     }
+
+    @PostMapping("/create")
+    public String createRecipe(@Valid @ModelAttribute("recipe") Recipe recipe,
+                               BindingResult bindingResult,
+                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                               Authentication authentication,
+                               @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+                               Model model) {
+        String email = AuthUtils.getUserEmail(authentication);
+
+        if (bindingResult.hasErrors()) {
+            prepareFormModel(model, email, recipe, redirectUrl);
+            return "recipes/recipe_form";
+        }
+
+        recipeService.addNewRecipe(recipe, imageFile, email);
+        return "redirect:/home/index";
+    }
+
+    private void prepareFormModel(Model model,
+                                  String userEmail,
+                                  Recipe recipe,
+                                  String redirectUrl) {
+        model.addAttribute("loggedInUser", userService.findByEmail(userEmail));
+        model.addAttribute("recipe", recipe);
+        model.addAttribute("difficulties", Difficulty.values());
+        model.addAttribute("categories", mealCategoryService.findAll());
+        model.addAttribute("ingredientList", ingredientService.findAll());
+        model.addAttribute("unitList", unitService.findAll());
+        model.addAttribute("ingredientCategories", ingredientCategoryService.findAll());
+        model.addAttribute("redirectUrl", redirectUrl);
+    }
+
 }

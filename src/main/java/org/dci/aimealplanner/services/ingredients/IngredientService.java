@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,5 +52,9 @@ public class IngredientService {
 
     public List<Ingredient> findAll() {
         return  ingredientRepository.findAll();
+    }
+
+    public Ingredient findById(Long id) {
+        return ingredientRepository.findById(id).orElseThrow(() -> new RuntimeException("Ingredient not found"));
     }
 }
