@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/navigation_tab_styles.css">
+</head>
+<body>
+<div th:replace="~{/fragments/navigation_tab :: navigation}"></div>
+
+<div class="dashboard-grid">
+    <div class="dashboard-card">
+        <img src="/images/admin_dashboard/user.png" alt="My Profile">
+        <h2>My Profile</h2>
+        <p>View and update your profile information.</p>
+    </div>
+    <div class="dashboard-card">
+        <img src="/images/admin_dashboard/group.png" alt="Manage Accounts">
+        <h2>Manage Accounts</h2>
+        <p>Add, edit, or remove user accounts from the system.</p>
+    </div>
+    <div class="dashboard-card">
+        <img src="/images/admin_dashboard/recipe.png" alt="Manage Recipes">
+        <h2>Manage Recipes</h2>
+        <p>Create, update, and delete recipes in your collection.</p>
+    </div>
+    <div class="dashboard-card">
+        <img src="/images/admin_dashboard/meal_plan.png" alt="Manage Meal Plans">
+        <h2>Manage Meal Plans</h2>
+        <p>Plan and organize meals for different users or goals.</p>
+    </div>
+    <div class="dashboard-card">
+        <img src="/images/admin_dashboard/health_tracker.png" alt="Manage Health Tracker">
+        <h2>Manage Health Tracker</h2>
+        <p>Monitor and analyze health and nutrition data.</p>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/js/admin_dashboard/scripts.js"></script>
+</body>
+</html>
