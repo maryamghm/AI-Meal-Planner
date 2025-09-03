@@ -5,9 +5,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.controllers.auth.AuthUtils;
 import org.dci.aimealplanner.entities.ingredients.Ingredient;
-import org.dci.aimealplanner.entities.ingredients.IngredientUnitRatio;
 import org.dci.aimealplanner.entities.ingredients.Unit;
 import org.dci.aimealplanner.entities.recipes.Recipe;
+import org.dci.aimealplanner.entities.recipes.RecipeIngredient;
 import org.dci.aimealplanner.models.Difficulty;
 import org.dci.aimealplanner.services.ingredients.IngredientCategoryService;
 import org.dci.aimealplanner.services.ingredients.IngredientService;
@@ -23,10 +23,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -45,27 +41,8 @@ public class RecipeController {
                             Model model,
                             HttpServletRequest request) {
         String email = AuthUtils.getUserEmail(authentication);
-        model.addAttribute("loggedInUser", userService.findByEmail(email));
-        model.addAttribute("recipe", new Recipe());
-        model.addAttribute("difficulties", Difficulty.values());
-        model.addAttribute("categories", mealCategoryService.findAll());
-        model.addAttribute("redirectUrl", request.getHeader("Referer"));
-
-        List<Ingredient> ingredientsList = ingredientService.findAll();
-        List<Unit> unitList = unitService.findAll();
-
-        Map<Long, List<Long>> allowedUnitsCsv = new HashMap<>();
-
-        for (Ingredient ingredient : ingredientsList) {
-            List<IngredientUnitRatio> relatedUnits = ingredientUnitRatioService.findByIngredient(ingredient);
-            List<Long> unitIds = relatedUnits.stream().map(ingredientUnitRatio -> ingredientUnitRatio.getUnit().getId()).collect(Collectors.toList());
-            allowedUnitsCsv.put(ingredient.getId(), unitIds);
-        }
-
-        model.addAttribute("ingredientList", ingredientsList);
-        model.addAttribute("unitList", unitList);
-        model.addAttribute("allowedUnitsCsv", allowedUnitsCsv);
-
+        Recipe recipe = new Recipe();
+        prepareFormModel(model, email, recipe, request.getHeader("Referer"));
         return "recipes/recipe_form";
     }
 
@@ -74,23 +51,31 @@ public class RecipeController {
                                BindingResult bindingResult,
                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                Authentication authentication,
+                               @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
                                Model model) {
         String email = AuthUtils.getUserEmail(authentication);
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("loggedInUser", userService.findByEmail(email));
-            model.addAttribute("recipe", recipe);
-            model.addAttribute("difficulties", Difficulty.values());
-            model.addAttribute("unitList", unitService.findAll());
-            model.addAttribute("ingredientCategories", ingredientCategoryService.findAll());
-            model.addAttribute("ingredientList", ingredientService.findAll());
-            model.addAttribute("categories", mealCategoryService.findAll());
+            prepareFormModel(model, email, recipe, redirectUrl);
             return "recipes/recipe_form";
         }
 
-        //recipeService.create(recipe);
-        return "redirect:/recipes";
+        recipeService.addNewRecipe(recipe, imageFile, email);
+        return "redirect:/home/index";
     }
 
+    private void prepareFormModel(Model model,
+                                  String userEmail,
+                                  Recipe recipe,
+                                  String redirectUrl) {
+        model.addAttribute("loggedInUser", userService.findByEmail(userEmail));
+        model.addAttribute("recipe", recipe);
+        model.addAttribute("difficulties", Difficulty.values());
+        model.addAttribute("categories", mealCategoryService.findAll());
+        model.addAttribute("ingredientList", ingredientService.findAll());
+        model.addAttribute("unitList", unitService.findAll());
+        model.addAttribute("ingredientCategories", ingredientCategoryService.findAll());
+        model.addAttribute("redirectUrl", redirectUrl);
+    }
 
 }

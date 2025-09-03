@@ -2,13 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
-  <title th:text="${recipe.id == null} ? 'Add Recipe' : 'Edit Recipe'">Recipe</title>
+  <title th:text="${recipe.id == null ? 'Add Recipe' : 'Edit Recipe'}">Recipe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body class="bg-light">
 <div class="container py-4">
-  <h2 class="mb-4" th:text="${recipe.id == null} ? 'Add Recipe' : 'Edit Recipe'"></h2>
+  <h2 class="mb-4" th:text="${recipe.id == null ? 'Add Recipe' : 'Edit Recipe'}"></h2>
 
   <form th:object="${recipe}"
         th:action="${recipe.id == null} ? @{/recipes/create} : @{/recipes/update/{id}(id=${recipe.id})}"
@@ -63,6 +63,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <label class="form-label mb-0">Ingredients</label>
           <div class="d-flex gap-2">
+            <!-- FIXED: only one type="button" -->
             <button type="button" class="btn btn-sm btn-secondary" onclick="addRow()">Add row</button>
             <a th:href="@{/ingredients/new}" class="btn btn-sm btn-outline-primary">Add Ingredient to DB</a>
           </div>
@@ -81,11 +82,12 @@
             <tbody id="ingredient-rows">
             <tr th:each="ri, iStat : *{ingredients}">
               <td>
-                <select class="form-select" th:field="*{ingredients[__${iStat.index}__].ingredient.id}">
+                <select class="form-select ingredient-select" th:field="*{ingredients[__${iStat.index}__].ingredient.id}">
                   <option value="">— choose —</option>
-                  <option th:each="ing : ${recipe.ingredients}"
+                  <option th:each="ing : ${ingredientList}"
                           th:value="${ing.id}"
-                          th:text="${ing.ingredient.name}"></option>
+                          th:text="${ing.name}">
+                  </option>
                 </select>
               </td>
               <td>
@@ -93,11 +95,10 @@
                        th:field="*{ingredients[__${iStat.index}__].amount}">
               </td>
               <td>
-                <select class="form-select" th:field="*{ingredients[__${iStat.index}__].unit.id}">
+                <select class="form-select unit-select"
+                        th:field="*{ingredients[__${iStat.index}__].unit.id}"
+                        th:attr="data-initial-unit=${ri.unit != null ? ri.unit.id : ''}">
                   <option value="">— none —</option>
-                  <option th:each="u : ${unitList}"
-                          th:value="${u.id}"
-                          th:text="${u.displayName != null ? u.displayName : u.code}"></option>
                 </select>
               </td>
               <td class="text-center">
@@ -115,61 +116,77 @@
                   placeholder="Step 1…&#10;Step 2…"></textarea>
       </div>
 
-
       <div class="col-12">
         <label for="image" class="form-label">Upload Image</label>
         <input id="image" type="file" name="imageFile" class="form-control">
       </div>
 
       <div class="col-12 d-flex gap-2 mt-2">
-        <button class="btn btn-primary" type="submit" th:text="${recipe.id == null} ? 'Create' : 'Update'"></button>
+        <button class="btn btn-primary" type="submit" th:text="${recipe.id == null ? 'Create' : 'Update'}"></button>
         <a th:href="${redirectUrl}" class="btn btn-secondary">Cancel</a>
       </div>
     </div>
   </form>
 </div>
 
-<div th:with="selectedIndex=${0}">
-  <select id="ingredientOptions" class="d-none">
-    <option value="">— choose —</option>
-    <option th:each="ing, iterStat : ${ingredientList}"
-            th:value="${ing.id}"
-            th:text="${ing.name}"
-            th:selected="${iterStat.index == selectedIndex}">
-    </option>
-  </select>
+<select id="ingredientMaster" class="d-none">
+  <option value="">— choose —</option>
+  <option th:each="ing : ${ingredientList}"
+          th:value="${ing.id}"
+          th:text="${ing.name}">
+  </option>
+</select>
 
-  <select id="unitOptions" class="d-none">
+<div id="unit-templates" class="d-none">
+  <select th:each="ing : ${ingredientList}" th:attr="data-ingredient-id=${ing.id}">
     <option value="">— none —</option>
-    <option th:each="u : ${ingredientList[selectedIndex].unitRatios}"
-            th:value="${u.unit.id}"
-            th:text="${u.unit.displayName != null ? u.unit.displayName : u.unit.code}">
+    <option th:each="ur : ${ing.unitRatios}"
+            th:value="${ur.unit.id}"
+            th:text="${ur.unit.displayName != null ? ur.unit.displayName : ur.unit.code}">
     </option>
   </select>
 </div>
 
-<script th:inline="javascript">
-  // Build ingredient -> units mapping from server-side ingredientList
-  const ingredientUnitsMap = /*[[${ingredientList}]]*/ []
-    .reduce((acc, ing) => {
-      const units = (ing.unitRatios || []).map(u => ({ id: u.unit.id, name: u.unit.displayName ? u.unit.displayName : u.unit.code }));
-      acc[ing.id] = units;
-      return acc;
-    }, {});
-
+<script>
   function nextIndex() {
     return document.querySelectorAll('#ingredient-rows tr').length;
   }
 
+  function getUnitTemplateHtml(ingredientId) {
+    const tpl = document.querySelector('#unit-templates select[data-ingredient-id="' + ingredientId + '"]');
+    return tpl ? tpl.innerHTML : '<option value="">— none —</option>';
+  }
+
+  function populateUnits(unitSelect, ingredientId, selectedUnitId) {
+    unitSelect.innerHTML = getUnitTemplateHtml(ingredientId || '');
+    if (selectedUnitId) {
+      unitSelect.value = String(selectedUnitId);
+      if (unitSelect.value !== String(selectedUnitId)) {
+        unitSelect.value = '';
+      }
+    }
+  }
+
+  function wireRow(row) {
+    const ingSel = row.querySelector('.ingredient-select');
+    const unitSel = row.querySelector('.unit-select');
+
+    const initialUnit = unitSel.getAttribute('data-initial-unit') || '';
+    populateUnits(unitSel, ingSel.value, initialUnit);
+
+    ingSel.addEventListener('change', () => {
+      populateUnits(unitSel, ingSel.value, null);
+    });
+  }
+
   function addRow() {
     const i = nextIndex();
-    const ingOpts = document.getElementById('ingredientOptions').innerHTML;
-    const unitOpts = document.getElementById('unitOptions').innerHTML;
+    const ingOpts = document.getElementById('ingredientMaster').innerHTML;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>
-        <select class="form-select" name="ingredients[${i}].ingredient.id">
+        <select class="form-select ingredient-select" name="ingredients[${i}].ingredient.id">
           ${ingOpts}
         </select>
       </td>
@@ -178,8 +195,8 @@
                name="ingredients[${i}].amount" placeholder="e.g., 2.5">
       </td>
       <td>
-        <select class="form-select" name="ingredients[${i}].unit.id">
-          ${unitOpts}
+        <select class="form-select unit-select" name="ingredients[${i}].unit.id" data-initial-unit="">
+          <option value="">— none —</option>
         </select>
       </td>
       <td class="text-center">
@@ -187,6 +204,7 @@
       </td>
     `;
     document.getElementById('ingredient-rows').appendChild(tr);
+    wireRow(tr);
   }
 
   function removeRow(btn) {
@@ -200,6 +218,10 @@
       });
     });
   }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('#ingredient-rows tr').forEach(wireRow);
+  });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

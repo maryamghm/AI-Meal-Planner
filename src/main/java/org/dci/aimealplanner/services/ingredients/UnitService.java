@@ -24,4 +24,8 @@ public class UnitService {
     public List<Unit> findAll() {
         return unitRepository.findAll();
     }
+
+    public Unit findById(Long id) {
+        return unitRepository.findById(id).orElseThrow(() -> new RuntimeException("Unit with id " + id + " not found"));
+    }
 }

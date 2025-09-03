@@ -34,7 +34,7 @@ public class Recipe {
     @Column(nullable = false)
     private Difficulty difficulty;
 
-    @Column(nullable = false)
+    @Column(name = "preparation_time_minutes", nullable = false)
     private Integer preparationTimeMinutes;
 
     @Column(nullable = false, precision = 6, scale = 2)
