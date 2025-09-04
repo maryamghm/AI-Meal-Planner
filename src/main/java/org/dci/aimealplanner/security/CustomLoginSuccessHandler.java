@@ -60,10 +60,10 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
-        if (isAdmin) {
-            response.sendRedirect("/admin");
-        } else {
+//        if (isAdmin) {
+//            response.sendRedirect("/admin");
+//        } else {
             response.sendRedirect("/index");
-        }
+//        }
     }
 }
