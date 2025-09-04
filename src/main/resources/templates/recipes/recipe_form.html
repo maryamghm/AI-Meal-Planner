@@ -54,7 +54,8 @@
           <option th:each="category : ${categories}"
                   th:value="${category.id}"
                   th:text="${category.name}"
-                  th:selected="${recipe.mealCategories.?[id == category.id].size() > 0}">
+                  th:selected="${recipe.mealCategories != null
+                     and #lists.contains(recipe.mealCategories.![id], category.id)}">
           </option>
         </select>
       </div>

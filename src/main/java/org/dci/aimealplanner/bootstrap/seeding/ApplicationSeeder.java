@@ -5,21 +5,26 @@ import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.entities.ingredients.Ingredient;
 import org.dci.aimealplanner.entities.ingredients.IngredientUnitRatio;
 import org.dci.aimealplanner.entities.ingredients.Unit;
+import org.dci.aimealplanner.entities.users.User;
 import org.dci.aimealplanner.integration.aiapi.GroqApiClient;
 import org.dci.aimealplanner.integration.aiapi.dtos.IngredientUnitFromAI;
 import org.dci.aimealplanner.integration.aiapi.dtos.UnitRatios;
 import org.dci.aimealplanner.integration.foodapi.FoodApiClient;
 import org.dci.aimealplanner.integration.foodapi.OpenFoodFactsClient;
 import org.dci.aimealplanner.integration.foodapi.dto.FoodItem;
+import org.dci.aimealplanner.models.Role;
+import org.dci.aimealplanner.models.UserType;
 import org.dci.aimealplanner.services.ingredients.IngredientCategoryService;
 import org.dci.aimealplanner.services.ingredients.IngredientService;
 import org.dci.aimealplanner.services.ingredients.IngredientUnitRatioService;
 import org.dci.aimealplanner.services.ingredients.UnitService;
 import org.dci.aimealplanner.services.recipes.MealCategoryService;
+import org.dci.aimealplanner.services.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,8 +32,8 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class IngredientSeeder implements ApplicationRunner {
-    private static final Logger log = LoggerFactory.getLogger(IngredientSeeder.class);
+public class ApplicationSeeder implements ApplicationRunner {
+    private static final Logger log = LoggerFactory.getLogger(ApplicationSeeder.class);
     private final FoodApiClient foodApiClient;
     private final OpenFoodFactsClient openFoodFactsClient;
     private final GroqApiClient  groqApiClient;
@@ -37,6 +42,8 @@ public class IngredientSeeder implements ApplicationRunner {
     private final MealCategoryService mealCategoryService;
     private final IngredientUnitRatioService ingredientUnitRatioService;
     private final UnitService unitService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
 
 
@@ -45,6 +52,19 @@ public class IngredientSeeder implements ApplicationRunner {
         //seedIngredients();
         // seedMealCategory();
         //retrieveUnits();
+        //addAnAdmin();
+    }
+
+    private void addAnAdmin() {
+        if (!userService.isAdminExist()) {
+            User admin = new User();
+            admin.setEmail("admin@ai-meal-planner.com");
+            admin.setPassword(passwordEncoder.encode("Admin123!"));
+            admin.setRole(Role.ADMIN);
+            admin.setUserType(UserType.LOCAL);
+            admin.setEmailVerified(true);
+            userService.create(admin);
+        }
     }
 
     private void retrieveUnits() throws JsonProcessingException {

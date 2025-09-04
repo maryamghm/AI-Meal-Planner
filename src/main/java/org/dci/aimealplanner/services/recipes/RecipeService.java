@@ -1,5 +1,6 @@
 package org.dci.aimealplanner.services.recipes;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.entities.ImageMetaData;
 import org.dci.aimealplanner.entities.ingredients.Ingredient;
@@ -76,4 +77,12 @@ public class RecipeService {
         }
         return normalizeRecipeIngredients;
     }
+
+    public Recipe findById(long id) {
+        return recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Recipe with id " + id + " not found"));
+    }
+
+//    public Recipe updateRecipe(Long id, Recipe recipe, MultipartFile imageFile, String email) {
+//
+//    }
 }
