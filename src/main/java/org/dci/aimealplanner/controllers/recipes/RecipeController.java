@@ -49,7 +49,8 @@ public class RecipeController {
         Recipe recipe = new Recipe();
         recipe.setIngredients(new ArrayList<>());
         recipe.setMealCategories(new HashSet<>());
-        prepareFormModel(model, email, recipe, request.getHeader("Referer"));
+        model.addAttribute("recipe", recipe);
+        prepareFormModel(model, email, request.getHeader("Referer"));
         return "recipes/recipe_form";
     }
 
@@ -63,7 +64,8 @@ public class RecipeController {
         String email = AuthUtils.getUserEmail(authentication);
 
         if (bindingResult.hasErrors()) {
-            prepareFormModel(model, email, recipe, redirectUrl);
+            model.addAttribute("recipe", recipe);
+            prepareFormModel(model, email, redirectUrl);
             return "recipes/recipe_form";
         }
 
@@ -78,17 +80,35 @@ public class RecipeController {
                                Model model) {
         String email = AuthUtils.getUserEmail(authentication);
         Recipe recipe = recipeService.findById(id);
-        prepareFormModel(model, email, recipe, request.getHeader("Referer"));
+        model.addAttribute("recipe", recipe);
+
+        prepareFormModel(model, email, request.getHeader("Referer"));
 
         return "recipes/recipe_form";
     }
 
+    @PostMapping("/update/{id}")
+    public String updateRecipe(@PathVariable Long id, @Valid @ModelAttribute Recipe recipe,
+                               BindingResult bindingResult,
+                               @RequestParam(required = false) MultipartFile imageFile,
+                               Authentication authentication,
+                               @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+                               Model model) {
+        String email = AuthUtils.getUserEmail(authentication);
+        if (bindingResult.hasErrors()) {
+           prepareFormModel(model, email, redirectUrl);
+           return "recipes/recipe_form";
+        }
+
+        //Recipe updated = recipeService.updateRecipe(id, recipe, imageFile, email);
+        return "redirect:/home/index";
+    }
+
     private void prepareFormModel(Model model,
                                   String userEmail,
-                                  Recipe recipe,
                                   String redirectUrl) {
         model.addAttribute("loggedInUser", userService.findByEmail(userEmail));
-        model.addAttribute("recipe", recipe);
+
         model.addAttribute("difficulties", Difficulty.values());
         model.addAttribute("categories", mealCategoryService.findAll());
         model.addAttribute("ingredientList", ingredientService.findAll());
