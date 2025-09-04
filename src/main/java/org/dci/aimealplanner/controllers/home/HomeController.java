@@ -10,4 +10,9 @@ public class HomeController {
     public String index() {
         return "home/index";
     }
+
+    @GetMapping("/account")
+    public String account() {
+        return "home/user_dashboard";
+    }
 }

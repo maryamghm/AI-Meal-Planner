@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <link rel="stylesheet" href="/css/navigation_tab_styles.css">
 </head>
 <body>
-<h1>Welcome</h1>
+<div th:replace="~{/fragments/navigation_tab :: navigation}"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/js/admin_dashboard/scripts.js"></script>
 </body>
 </html>

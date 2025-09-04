@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/css/navigation_tab_styles.css">
+</head>
+<body>
+<div th:replace="~{/fragments/navigation_tab :: navigation}"></div>
+
+<div class="dashboard-grid">
+    <a class="dashboard-card" href="#">
+        <img src="/images/admin_dashboard/user.png" alt="My Profile">
+        <h2>My Profile</h2>
+        <p>View and update your profile information.</p>
+    </a>
+    <div class="dashboard-card" sec:authorize="hasRole('ADMIN')">
+        <img src="/images/admin_dashboard/manage_accounts.png" alt="Manage Accounts">
+        <h2>Manage Accounts</h2>
+        <p>Add, edit, or remove user accounts from the system.</p>
+    </div>
+    <div class="dashboard-card">
+        <img src="/images/admin_dashboard/manage_recipes.png" alt="Manage Recipes">
+        <h2>Manage Recipes</h2>
+        <p>Create, update, and delete recipes in your collection.</p>
+    </div>
+    <div class="dashboard-card">
+        <img src="/images/admin_dashboard/manage_meal_plans.png" alt="Manage Meal Plans">
+        <h2>Manage Meal Plans</h2>
+        <p>Plan and organize meals for different users or goals.</p>
+    </div>
+    <div class="dashboard-card" sec:authorize="hasRole('USER')">
+        <img src="/images/admin_dashboard/favorite_recipes.png" alt="Favorite Recipes">
+        <h2>Favorite Recipes</h2>
+        <p>View your list of favorite recipes and explore them in detail</p>
+    </div>
+    <div class="dashboard-card" sec:authorize="hasRole('USER')">
+        <img src="/images/admin_dashboard/favorite_meal_plans.png" alt="Favorite Meal Plans">
+        <h2>Favorite Meal Plans</h2>
+        <p>Access your saved meal plans and quickly follow them again.</p>
+    </div>
+    <div class="dashboard-card" sec:authorize="hasRole('USER')">
+        <img src="/images/admin_dashboard/health_tracker.png" alt="Manage Health Tracker">
+        <h2>Health Tracker</h2>
+        <p>Monitor and analyze health and nutrition data.</p>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/js/admin_dashboard/scripts.js"></script>
+</body>
+</html>
