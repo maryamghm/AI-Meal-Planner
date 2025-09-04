@@ -2,8 +2,6 @@ package org.dci.aimealplanner.services.ingredients;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.dci.aimealplanner.bootstrap.seeding.IngredientSeedData;
-import org.dci.aimealplanner.bootstrap.seeding.IngredientSeeder;
 import org.dci.aimealplanner.entities.ingredients.Ingredient;
 import org.dci.aimealplanner.entities.ingredients.NutritionFact;
 import org.dci.aimealplanner.integration.foodapi.dto.FoodItem;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -115,4 +115,8 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email).isEmpty();
     }
 
+    public boolean isAdminExist() {
+        return userRepository.findByRole(Role.ADMIN).isPresent();
+    }
+
 }
