@@ -32,13 +32,13 @@ public class Recipe {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Difficulty difficulty;
+    private Difficulty difficulty = Difficulty.EASY;
 
     @Column(name = "preparation_time_minutes", nullable = false)
     private Integer preparationTimeMinutes;
 
     @Column(nullable = false, precision = 6, scale = 2)
-    @DecimalMin(value = "0.01")
+    @DecimalMin(value = "0.1")
     private BigDecimal servings;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

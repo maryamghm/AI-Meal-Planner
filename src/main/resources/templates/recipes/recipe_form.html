@@ -64,7 +64,6 @@
         <div class="d-flex justify-content-between align-items-center">
           <label class="form-label mb-0">Ingredients</label>
           <div class="d-flex gap-2">
-            <!-- FIXED: only one type="button" -->
             <button type="button" class="btn btn-sm btn-secondary" onclick="addRow()">Add row</button>
             <a th:href="@{/ingredients/new}" class="btn btn-sm btn-outline-primary">Add Ingredient to DB</a>
           </div>
@@ -82,6 +81,7 @@
             </thead>
             <tbody id="ingredient-rows">
             <tr th:each="ri, iStat : *{ingredients}">
+              <input type="hidden" th:field="*{ingredients[__${iStat.index}__].id}" />
               <td>
                 <select class="form-select ingredient-select" th:field="*{ingredients[__${iStat.index}__].ingredient.id}">
                   <option value="">— choose —</option>
@@ -186,6 +186,7 @@
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
+      <input type="hidden" name="ingredients[${i}].id" value="">
       <td>
         <select class="form-select ingredient-select" name="ingredients[${i}].ingredient.id">
           ${ingOpts}

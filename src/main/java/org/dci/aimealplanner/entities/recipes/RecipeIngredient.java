@@ -47,4 +47,21 @@ public class RecipeIngredient {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "unit_id", nullable = false)
     private Unit unit;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (!(o instanceof RecipeIngredient that)) return false;
+
+        return id.equals(that.id) && recipe.getId().equals(that.recipe.getId()) && ingredient.getId().equals(that.ingredient.getId()) && amount.equals(that.amount) && unit.getId().equals(that.unit.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + recipe.getId().hashCode();
+        result = 31 * result + ingredient.getId().hashCode();
+        result = 31 * result + amount.hashCode();
+        result = 31 * result + unit.getId().hashCode();
+        return result;
+    }
 }

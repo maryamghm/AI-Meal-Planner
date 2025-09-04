@@ -10,6 +10,8 @@ import org.dci.aimealplanner.entities.recipes.MealCategory;
 import org.dci.aimealplanner.entities.recipes.Recipe;
 import org.dci.aimealplanner.entities.recipes.RecipeIngredient;
 import org.dci.aimealplanner.models.Difficulty;
+import org.dci.aimealplanner.models.recipes.RecipeDTO;
+import org.dci.aimealplanner.models.recipes.UpdateRecipeDTO;
 import org.dci.aimealplanner.services.ingredients.IngredientCategoryService;
 import org.dci.aimealplanner.services.ingredients.IngredientService;
 import org.dci.aimealplanner.services.ingredients.IngredientUnitRatioService;
@@ -49,13 +51,13 @@ public class RecipeController {
         Recipe recipe = new Recipe();
         recipe.setIngredients(new ArrayList<>());
         recipe.setMealCategories(new HashSet<>());
-        model.addAttribute("recipe", recipe);
+        model.addAttribute("recipe", RecipeDTO.from(recipe));
         prepareFormModel(model, email, request.getHeader("Referer"));
         return "recipes/recipe_form";
     }
 
     @PostMapping("/create")
-    public String createRecipe(@Valid @ModelAttribute("recipe") Recipe recipe,
+    public String createRecipe(@Valid @ModelAttribute("recipe") UpdateRecipeDTO updateRecipeDTO,
                                BindingResult bindingResult,
                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                Authentication authentication,
@@ -64,12 +66,12 @@ public class RecipeController {
         String email = AuthUtils.getUserEmail(authentication);
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("recipe", recipe);
+            model.addAttribute("recipe", updateRecipeDTO);
             prepareFormModel(model, email, redirectUrl);
             return "recipes/recipe_form";
         }
 
-        recipeService.addNewRecipe(recipe, imageFile, email);
+        recipeService.addNewRecipe(updateRecipeDTO, imageFile, email);
         return "redirect:/home/index";
     }
 
@@ -80,7 +82,8 @@ public class RecipeController {
                                Model model) {
         String email = AuthUtils.getUserEmail(authentication);
         Recipe recipe = recipeService.findById(id);
-        model.addAttribute("recipe", recipe);
+        RecipeDTO recipeDTO = RecipeDTO.from(recipe);
+        model.addAttribute("recipe", recipeDTO);
 
         prepareFormModel(model, email, request.getHeader("Referer"));
 
@@ -88,7 +91,7 @@ public class RecipeController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateRecipe(@PathVariable Long id, @Valid @ModelAttribute Recipe recipe,
+    public String updateRecipe(@PathVariable Long id, @Valid @ModelAttribute UpdateRecipeDTO updateRecipeDTO,
                                BindingResult bindingResult,
                                @RequestParam(required = false) MultipartFile imageFile,
                                Authentication authentication,
@@ -96,11 +99,12 @@ public class RecipeController {
                                Model model) {
         String email = AuthUtils.getUserEmail(authentication);
         if (bindingResult.hasErrors()) {
-           prepareFormModel(model, email, redirectUrl);
-           return "recipes/recipe_form";
+            model.addAttribute("recipe", updateRecipeDTO);
+            prepareFormModel(model, email, redirectUrl);
+            return "recipes/recipe_form";
         }
 
-        //Recipe updated = recipeService.updateRecipe(id, recipe, imageFile, email);
+        Recipe updated = recipeService.updateRecipe(id, updateRecipeDTO, imageFile, email);
         return "redirect:/home/index";
     }
 
@@ -108,7 +112,6 @@ public class RecipeController {
                                   String userEmail,
                                   String redirectUrl) {
         model.addAttribute("loggedInUser", userService.findByEmail(userEmail));
-
         model.addAttribute("difficulties", Difficulty.values());
         model.addAttribute("categories", mealCategoryService.findAll());
         model.addAttribute("ingredientList", ingredientService.findAll());
