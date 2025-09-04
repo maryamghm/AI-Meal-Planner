@@ -76,4 +76,8 @@ public class RecipeService {
         }
         return normalizeRecipeIngredients;
     }
+
+    public Recipe findById(long id) {
+        return recipeRepository.findById(id).orElseThrow(() -> new RuntimeException("Recipe with id " + id + " not found"));
+    }
 }

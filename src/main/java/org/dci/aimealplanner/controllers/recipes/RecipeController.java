@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.dci.aimealplanner.controllers.auth.AuthUtils;
 import org.dci.aimealplanner.entities.ingredients.Ingredient;
 import org.dci.aimealplanner.entities.ingredients.Unit;
+import org.dci.aimealplanner.entities.recipes.MealCategory;
 import org.dci.aimealplanner.entities.recipes.Recipe;
 import org.dci.aimealplanner.entities.recipes.RecipeIngredient;
 import org.dci.aimealplanner.models.Difficulty;
@@ -22,6 +23,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Controller
@@ -42,6 +47,8 @@ public class RecipeController {
                             HttpServletRequest request) {
         String email = AuthUtils.getUserEmail(authentication);
         Recipe recipe = new Recipe();
+        recipe.setIngredients(new ArrayList<>());
+        recipe.setMealCategories(new HashSet<>());
         prepareFormModel(model, email, recipe, request.getHeader("Referer"));
         return "recipes/recipe_form";
     }
@@ -64,6 +71,18 @@ public class RecipeController {
         return "redirect:/home/index";
     }
 
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id,
+                               Authentication authentication,
+                               HttpServletRequest request,
+                               Model model) {
+        String email = AuthUtils.getUserEmail(authentication);
+        Recipe recipe = recipeService.findById(id);
+        prepareFormModel(model, email, recipe, request.getHeader("Referer"));
+
+        return "recipes/recipe_form";
+    }
+
     private void prepareFormModel(Model model,
                                   String userEmail,
                                   Recipe recipe,
@@ -77,5 +96,7 @@ public class RecipeController {
         model.addAttribute("ingredientCategories", ingredientCategoryService.findAll());
         model.addAttribute("redirectUrl", redirectUrl);
     }
+
+
 
 }
